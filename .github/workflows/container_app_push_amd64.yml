@@ -8,7 +8,7 @@ on:
         type: string
         description: "Reference of the base image to build on in full qualified form [<registry>/]<namespace>/<repo>:<tag>"
         required: false
-        default: "gdcc/base:unstable"
+        default: "brmmtest/base:unstable"
   pull_request:
     branches:
       - develop
