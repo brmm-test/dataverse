@@ -70,6 +70,6 @@ jobs:
     secrets: inherit
     needs:
       - build
-    uses: ./.github/workflows/container_app_push.yml
+    uses: ./.github/workflows/container_app_push_amd64.yml
     with:
       base-image-ref: ${{ needs.build.outputs.base-image-ref }}
