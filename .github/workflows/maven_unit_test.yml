@@ -176,5 +176,5 @@ jobs:
             packages: write
             pull-requests: write
         needs: integration-test
-        uses: ./.github/workflows/container_app_push.yml
+        uses: ./.github/workflows/container_app_push_amd64.yml
         secrets: inherit
