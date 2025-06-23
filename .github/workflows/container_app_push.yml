@@ -34,7 +34,7 @@ jobs:
             packages: write
             pull-requests: write
         # Only run in upstream repo - avoid unnecessary runs in forks
-        if: ${{ github.repository_owner == 'IQSS' }}
+        if: ${{ github.repository_owner == 'brmm-test' }}
 
         steps:
             - name: Checkout and Setup Maven
