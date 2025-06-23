@@ -16,7 +16,7 @@ on:
     paths:
       - 'src/main/docker/**'
       - 'modules/container-configbaker/**'
-      - '.github/workflows/container_app_push.yml'
+      - '.github/workflows/container_app_push_amd64.yml'
 
 env:
   IMAGE_TAG: unstable
