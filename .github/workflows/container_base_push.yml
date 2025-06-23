@@ -4,7 +4,8 @@ name: Base Container Image
 on:
     push:
         branches:
-            - 'develop'
+            #- 'develop'
+            - 'main'
         # "Path filters are not evaluated for pushes of tags" https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#onpushpull_requestpull_request_targetpathspaths-ignore
         paths:
             - 'modules/container-base/**'
