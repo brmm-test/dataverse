@@ -1,0 +1,75 @@
+---
+name: Base Container Image (amd64 only)
+
+on:
+  push:
+    branches:
+      - 'develop'
+    paths:
+      - 'modules/container-base/**'
+      - '!modules/container-base/src/backports/**'
+      - '!modules/container-base/README.md'
+      - 'modules/dataverse-parent/pom.xml'
+      - '.github/workflows/container_base_push_amd64.yml'
+
+env:
+  PLATFORMS: linux/amd64
+  DEVELOPMENT_BRANCH: develop
+
+jobs:
+  build:
+    name: Base Image (amd64)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    # Only run in your repo, or remove this line to run everywhere
+    if: ${{ github.repository_owner == 'brmm-test' }}
+    outputs:
+      base-image-ref: ${{ steps.determine-name.outputs.full-ref }}
+
+    steps:
+      - name: Checkout and Setup Maven
+        uses: IQSS/dataverse/.github/actions/setup-maven@develop
+        with:
+          pom-paths: modules/container-base/pom.xml
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Determine base image name
+        id: determine-name
+        run: |
+          BASE_IMAGE=$( mvn initialize help:evaluate -Pct -f modules/container-base -Dexpression=base.image -q -DforceStdout )
+          BASE_IMAGE_UPCOMING=$( mvn initialize help:evaluate -Pct -f modules/container-base -Dexpression=base.image -Dbase.image.tag.suffix="" -q -DforceStdout )
+          
+          echo "BASE_IMAGE=${BASE_IMAGE}" | tee -a "${GITHUB_ENV}"
+          echo "BASE_IMAGE_UPCOMING=${BASE_IMAGE_UPCOMING}" | tee -a "${GITHUB_ENV}"
+          echo "full-ref=${BASE_IMAGE_UPCOMING}" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Configure update of "latest" tag for development branch
+        id: develop-tag
+        run: |
+          echo "tag-options=-Ddocker.tags.develop=unstable -Ddocker.tags.upcoming=${BASE_IMAGE_UPCOMING#*:}" | tee -a "${GITHUB_OUTPUT}"
+
+      - name: Deploy amd64 base container image to Docker Hub
+        id: build
+        run: |
+          mvn -f modules/container-base -Pct deploy -Ddocker.noCache -Ddocker.platforms=${{ env.PLATFORMS }} \
+            -Ddocker.imagePropertyConfiguration=override ${{ steps.develop-tag.outputs.tag-options }}
+
+  push-app-img:
+    name: "Rebase & Publish App Image"
+    permissions:
+      contents: read
+      packages: write
+      pull-requests: write
+    secrets: inherit
+    needs:
+      - build
+    uses: ./.github/workflows/container_app_push.yml
+    with:
+      base-image-ref: ${{ needs.build.outputs.base-image-ref }}
