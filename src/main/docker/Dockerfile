@@ -21,7 +21,7 @@
 #
 
 # Make the Java base image and version configurable (useful for trying newer Java versions and flavors)
-ARG BASE_IMAGE="gdcc/base:unstable"
+ARG BASE_IMAGE="brmmtest/base:unstable"
 FROM $BASE_IMAGE
 
 # Make Payara use the "ct" profile for MicroProfile Config. Will switch various defaults for the application
@@ -52,7 +52,7 @@ LABEL org.opencontainers.image.created="@git.build.time@" \
       org.opencontainers.image.authors="Research Data Management at FZJ <forschungsdaten@fz-juelich.de>" \
       org.opencontainers.image.url="https://guides.dataverse.org/en/latest/container/" \
       org.opencontainers.image.documentation="https://guides.dataverse.org/en/latest/container/" \
-      org.opencontainers.image.source="https://github.com/IQSS/dataverse" \
+      org.opencontainers.image.source="https://github.com/brmm-test/dataverse" \
       org.opencontainers.image.version="$APP_IMAGE_VERSION" \
       org.opencontainers.image.revision="@git.commit.id.abbrev@" \
       org.opencontainers.image.vendor="Global Dataverse Community Consortium" \
